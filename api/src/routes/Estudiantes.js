@@ -1,18 +1,16 @@
 const { Router } = require("express");
 const router = Router();
-const Estudiantes = require("../models/Estudiantes.js");
-const mongoose = require("mongoose");
 const {
   findStudents,
   createNewStudent,
   deleteStudent,
   updateStudent,
-  findStudentById,
+  searchStudentById,
 } = require("../controllers/estudiantes.controller.js");
 
 router.get("/", findStudents);
 
-router.get("/:id", findStudents);
+router.get("/:id", searchStudentById);
 
 router.post("/", createNewStudent);
 

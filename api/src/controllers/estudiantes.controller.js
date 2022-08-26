@@ -1,33 +1,56 @@
 const { Estudiantes } = require("../db.js");
-const { conn } = require("../db.js");
-const mongoose = require("mongoose");
 
 exports.findStudents = async (req, res, next) => {
-  const id = req.params.id;
-  console.log('id :>> ', req);
+  const name = req.query.name;
+  console.log("name :>> ", name);
   try {
-    if(id){
-      const student = await Estudiantes.findById(id);
-      res.send(student)
-    }else {
-      const allStudents = await Estudiantes.find({});
-      res.send(allStudents);
+    if (name) {
+      await Estudiantes.find({
+        $text: {
+          $search: name,
+          $caseSensitive: false,
+        },
+      })
+        .then((result) => {
+          result.length === 0
+            ? res.status(404).json({ error: `No student with name: ${name}` })
+            : res.send(result);
+        })
+        .catch((err) => {
+          res.send(err);
+        });
+    } else {
+      await Estudiantes.find({})
+        .then((result) => {
+          res.send(result);
+        })
+        .catch((err) => {
+          res.senc(err);
+        });
     }
   } catch (err) {
-    console.log("err :>> ", err);
     res.send(err);
   }
 };
 
-// exports.findStudentById = async (req, res, next) => {
-//   try {
-//     const id = req.params.id;
-//     const student = await Estudiantes.findById(id);
-//     res.send(student);
-//   } catch (err) {
-//     res.send(err)
-//   }
-// }
+exports.searchStudentById = async (req, res, next) => {
+  const id = req.params.id;
+  try {
+    await Estudiantes.findById(id)
+      .then((result) => {
+        res.send(result);
+      })
+      .catch((err) => {
+        const length = Object.keys(err.reason).length;
+        if (length === 0)
+          res.status(404).json({
+            error: "There is no match",
+          });
+      });
+  } catch (err) {
+    res.send(err);
+  }
+};
 
 exports.createNewStudent = async (req, res, next) => {
   const name = req.body.name;
@@ -49,9 +72,11 @@ exports.createNewStudent = async (req, res, next) => {
       })
       .catch((err) => {
         console.log("err :>> ", err);
+        res.send(err);
       });
   } catch (err) {
     console.log("err :>> ", err);
+    res.send(err);
   }
 };
 
@@ -76,7 +101,9 @@ exports.updateStudent = async (req, res, next) => {
     const body = req.body;
     console.log("body :>> ", body);
     const queryUpdate = { email: body.email };
-    await Estudiantes.findOneAndUpdate(queryUpdate, { $set: { name: body.name } })
+    await Estudiantes.findOneAndUpdate(queryUpdate, {
+      $set: { name: body.name },
+    })
       .then((result) => {
         if (!result) {
           res.send("No hay registros que actualizar");
