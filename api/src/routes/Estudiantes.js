@@ -3,15 +3,21 @@ const router = Router();
 const Estudiantes = require("../models/Estudiantes.js");
 const mongoose = require("mongoose");
 const {
-  findAllStudents,
+  findStudents,
   createNewStudent,
   deleteStudent,
+  updateStudent,
+  findStudentById,
 } = require("../controllers/estudiantes.controller.js");
 
-router.get("/", findAllStudents);
+router.get("/", findStudents);
+
+router.get("/:id", findStudents);
 
 router.post("/", createNewStudent);
 
 router.delete("/:id", deleteStudent);
+
+router.put("/:id", updateStudent);
 
 module.exports = router;

@@ -1,6 +1,5 @@
 require("dotenv").config();
 const mongoose = require("mongoose");
-const { model } = require("mongoose");
 const fs = require("fs");
 const path = require("path");
 //Nos traemos la ruta de los modelos
